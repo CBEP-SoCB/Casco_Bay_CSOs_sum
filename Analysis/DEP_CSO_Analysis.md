@@ -7,12 +7,9 @@ Curtis C. Bohlen, Casco Bay Estuary Partnership
 -   [Load DEP Data](#load-dep-data)
     -   [Establish Folder References](#establish-folder-references)
 -   [Load Weather Data](#load-weather-data)
-    -   [Establish Folder Reference](#establish-folder-reference)
     -   [Access data](#access-data)
     -   [Examine Correlations](#examine-correlations)
 -   [Refine Data](#refine-data)
-    -   [Identify Casco Bay CSO Communities by
-        Name](#identify-casco-bay-cso-communities-by-name)
     -   [Casco Bay Towns Data](#casco-bay-towns-data)
     -   [Totals Data](#totals-data)
 -   [Correlations by Year](#correlations-by-year)
@@ -43,22 +40,27 @@ Curtis C. Bohlen, Casco Bay Estuary Partnership
 
 ``` r
 library(tidyverse)
-#> -- Attaching packages --------------------------------------- tidyverse 1.3.0 --
-#> v ggplot2 3.3.3     v purrr   0.3.4
-#> v tibble  3.0.5     v dplyr   1.0.3
-#> v tidyr   1.1.2     v stringr 1.4.0
-#> v readr   1.4.0     v forcats 0.5.0
+#> Warning: package 'tidyverse' was built under R version 4.0.5
+#> -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+#> v ggplot2 3.3.5     v purrr   0.3.4
+#> v tibble  3.1.4     v dplyr   1.0.7
+#> v tidyr   1.1.3     v stringr 1.4.0
+#> v readr   2.0.1     v forcats 0.5.1
+#> Warning: package 'ggplot2' was built under R version 4.0.5
+#> Warning: package 'tibble' was built under R version 4.0.5
+#> Warning: package 'tidyr' was built under R version 4.0.5
+#> Warning: package 'readr' was built under R version 4.0.5
+#> Warning: package 'dplyr' was built under R version 4.0.5
+#> Warning: package 'forcats' was built under R version 4.0.5
 #> -- Conflicts ------------------------------------------ tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
-
 library(CBEPgraphics)
 load_cbep_fonts()
 theme_set(theme_cbep())
 
 library(corrplot)
-#> corrplot 0.84 loaded
-
+#> corrplot 0.90 loaded
 library(mblm)  # Includes a Theil-Sen estimator, and an extension by Seigel
 ```
 
@@ -67,16 +69,16 @@ library(mblm)  # Includes a Theil-Sen estimator, and an extension by Seigel
 ## Establish Folder References
 
 ``` r
-sibfldnm <- 'Derived_Data'
+sibfldnm <- 'Data'
 parent   <- dirname(getwd())
 sibling  <- file.path(parent,sibfldnm)
-
-dir.create(file.path(getwd(), 'figures'), showWarnings = FALSE)
+niecefldnm <- 'DEP Data'
+niece <- file.path(sibling, niecefldnm)
 ```
 
 ``` r
 fn <-'DEP_Annual_Totals.csv'
-fpath <- file.path(sibling, fn)
+fpath <- file.path(niece, fn)
 the_data <- read_csv(fpath, col_types = 
                        c(Community = col_character(),
                          Year = col_integer(),
@@ -86,14 +88,6 @@ the_data <- read_csv(fpath, col_types =
 ```
 
 # Load Weather Data
-
-## Establish Folder Reference
-
-``` r
-sibfldnm <- 'Original_Data'
-parent   <- dirname(getwd())
-sibling  <- file.path(parent,sibfldnm)
-```
 
 ## Access data
 
@@ -138,19 +132,9 @@ time series.)
 
 The high correlation between number of large storms and total
 precipitation may complicate separating those two factors in any
-analysis – but we don’t really need to do that in this worksheet.
+analysis.
 
 # Refine Data
-
-## Identify Casco Bay CSO Communities by Name
-
-``` r
-cb_cso_towns <- c("Cape Elizabeth",
-                "Portland & PWD",
-                "South Portland",
-                "Westbrook",
-                "Yarmouth")            
-```
 
 ## Casco Bay Towns Data
 
@@ -160,7 +144,6 @@ data are not meaningful, so we strip them out here.
 
 ``` r
 cb_towns_data_long <- the_data %>%
-  filter(Community %in% cb_cso_towns) %>%
   mutate(VolumeMG = Volume / (10^6)) %>%
   filter(Year > 1996)
 
@@ -193,22 +176,10 @@ Including total discharge volumes each year, in Millions of Gallons.
 ``` r
 annual_data <- the_data %>%
   group_by(Year) %>%
-  summarize(TotVol      = sum(Volume,   na.rm = TRUE),
-            TotVolMG    = TotVol / (10^6),
-            TotEvents   = sum(Events,   na.rm = TRUE),
-            TotOutfalls = sum(Outfalls, na.rm = TRUE),
-            
-            CBTotVol      = sum(Volume*(Community %in% cb_cso_towns),
-                                na.rm = TRUE),
+  summarize(CBTotVol      = sum(Volume, na.rm = TRUE),
             CBVolMG    = CBTotVol / (10^6),
-            CBTotEvents   = sum(Events*(Community %in% cb_cso_towns),
-                                na.rm = TRUE),
-            CBTotOutfalls = sum(Outfalls*(Community %in% cb_cso_towns),
-                                na.rm = TRUE),
-            
-            CBPctVol       = round(CBTotVol / TotVol, 4) * 100,
-            CBPctEvents    = round(CBTotEvents / TotEvents, 4) * 100,
-            CBPctOutfalls  = round(CBTotOutfalls / TotOutfalls, 4) * 100,
+            CBTotEvents   = sum(Events, na.rm = TRUE),
+            CBTotOutfalls = sum(Outfalls, na.rm = TRUE),
             .groups = 'drop') %>%
   filter(Year > 1996)
 ```
@@ -242,18 +213,18 @@ rm(cors)
 
 What jumps out is:
 
-1.  Year is negatively correlated with volume and events
+1.  Year is negatively correlated with volume and events.  
 2.  Year is positively (though not strongly) correlated with
-    precipitation.
+    precipitation.  
 3.  Total CSO VOlumes and Events statewide are dropping even faster than
     in our region, so the percentage of the states CSOs from her is
-    climbing.
+    climbing.  
 4.  Volume and number of CSO events are correlated across the region.
-    Bad years in one jurisdiction are bad for many.
+    Bad years in one jurisdiction are bad for many.  
 5.  Portland’s CSOs are a big enough part of regional and state-wide
-    totals so that they are always highly correlated with totals. The
-    precipitation variables are not all that highly correlated with the
-    other variables, but that
+    totals so that they are always highly correlated with totals.  
+6.  The precipitation variables are not all that highly correlated with
+    the other variables
 
 # Generate Models and Extract Coefficients
 
@@ -319,19 +290,17 @@ res <- cb_towns_data_long %>%
         # untransformed values, since Kendal's Tau, which is based on order, not 
         # magnitude.
   select(-tsCortest)
-#> Warning: Problem with `mutate()` input `tsCortest`.
-#> i Cannot compute exact p-value with ties
-#> i Input `tsCortest` is `(map(data, function(df) cor.test(df$Year, df$Volume, method = "kendall")))`.
-#> i The error occurred in group 1: Community = "Cape Elizabeth".
+#> Warning in cor.test.default(df$Year, df$Volume, method = "kendall"): Cannot
+#> compute exact p-value with ties
 res
 #> # A tibble: 4 x 13
 #> # Groups:   Community [4]
-#>   Community data  mylm  lmslope   lmsd    tlm     lmp myts  tsslope  tscor
-#>   <chr>     <lis> <lis>   <dbl>  <dbl>  <dbl>   <dbl> <lis>   <dbl>  <dbl>
-#> 1 Cape Eli~ <tib~ <lm>  -0.0405 0.0766 -0.529 6.02e-1 <mbl~  -0.226 -0.323
-#> 2 Portland~ <tib~ <lm>  -0.0725 0.0158 -4.58  1.63e-4 <mbl~ -45.5   -0.502
-#> 3 South Po~ <tib~ <lm>  -0.0981 0.0275 -3.57  1.82e-3 <mbl~  -1.24  -0.470
-#> 4 Westbrook <tib~ <lm>   0.0108 0.0625  0.172 8.65e-1 <mbl~  -0.532 -0.138
+#>   Community   data      mylm  lmslope   lmsd    tlm     lmp myts  tsslope  tscor
+#>   <chr>       <list>    <lis>   <dbl>  <dbl>  <dbl>   <dbl> <lis>   <dbl>  <dbl>
+#> 1 Cape Eliza~ <tibble ~ <lm>  -0.0405 0.0766 -0.529 6.02e-1 <mbl~  -0.226 -0.323
+#> 2 Portland &~ <tibble ~ <lm>  -0.0725 0.0158 -4.58  1.63e-4 <mbl~ -45.5   -0.502
+#> 3 South Port~ <tibble ~ <lm>  -0.0981 0.0275 -3.57  1.82e-3 <mbl~  -1.24  -0.470
+#> 4 Westbrook   <tibble ~ <lm>   0.0108 0.0625  0.172 8.65e-1 <mbl~  -0.532 -0.138
 #> # ... with 3 more variables: tsp <dbl>, mylogts <list>, tslogslope <dbl>
 ```
 
@@ -425,7 +394,7 @@ par(oldpar)
 
 The residuals from the log-linear models are not bad. There are a few
 outliers.  
-We have no outliers wit hhigh leverage. These models are actually not
+We have no outliers with high leverage. These models are actually not
 bad.
 
 ## Log Median Based Models
@@ -503,7 +472,7 @@ res %>%
 ```
 
 These are statistically correct annual proportional reductions, but they
-do not capture change, as pointed out by one of out reviewers.
+do not capture change, as pointed out by one of our reviewers.
 
 ## Casco Bay - Wide Reductions over 23-Years
 

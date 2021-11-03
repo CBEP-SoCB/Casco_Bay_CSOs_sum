@@ -35,16 +35,16 @@ library(mblm)  # Includes a Theil-Sen estimator, and an extension by Seigel
 # Load DEP Data
 ## Establish Folder References
 ```{r folder_references}
-sibfldnm <- 'Derived_Data'
+sibfldnm <- 'Data'
 parent   <- dirname(getwd())
 sibling  <- file.path(parent,sibfldnm)
-
-dir.create(file.path(getwd(), 'figures'), showWarnings = FALSE)
+niecefldnm <- 'DEP Data'
+niece <- file.path(sibling, niecefldnm)
 ```
 
 ```{r load_data}
 fn <-'DEP_Annual_Totals.csv'
-fpath <- file.path(sibling, fn)
+fpath <- file.path(niece, fn)
 the_data <- read_csv(fpath, col_types = 
                        c(Community = col_character(),
                          Year = col_integer(),
@@ -54,13 +54,6 @@ the_data <- read_csv(fpath, col_types =
 ```
 
 # Load Weather Data
-## Establish Folder Reference
-```{r folder_references_2}
-sibfldnm <- 'Original_Data'
-parent   <- dirname(getwd())
-sibling  <- file.path(parent,sibfldnm)
-```
-
 ## Access data
 We extract annual Precipitation Totals (in mm), and Annual Days with more than
 one tenth of an inch (2.5mm), and one inch (25.4mm) of rain from the annual
@@ -92,26 +85,15 @@ year and number of large storm and total rainfall even over this short period.
 (See the Climate Change indicator for analysis of a longer time series.)
 
 The high correlation between number of large storms and total precipitation may
-complicate separating those two factors in any analysis -- but we don't really
-need to do that in this worksheet.
+complicate separating those two factors in any analysis.
 
 # Refine Data
-## Identify Casco Bay CSO Communities by Name
-```{r casco_towns}
-cb_cso_towns <- c("Cape Elizabeth",
-                "Portland & PWD",
-                "South Portland",
-                "Westbrook",
-                "Yarmouth")            
-```
-
 ## Casco Bay Towns Data
 Although the number of events and outfalls were reported in the 2008 CSO report
 for years prior to 2006, they show no variation, suggesting these data are not
 meaningful, so we strip them out here.
 ```{r casco_towns_data}
 cb_towns_data_long <- the_data %>%
-  filter(Community %in% cb_cso_towns) %>%
   mutate(VolumeMG = Volume / (10^6)) %>%
   filter(Year > 1996)
 
@@ -135,22 +117,10 @@ Including total discharge volumes each year, in Millions of Gallons.
 ```{r annual_data}
 annual_data <- the_data %>%
   group_by(Year) %>%
-  summarize(TotVol      = sum(Volume,   na.rm = TRUE),
-            TotVolMG    = TotVol / (10^6),
-            TotEvents   = sum(Events,   na.rm = TRUE),
-            TotOutfalls = sum(Outfalls, na.rm = TRUE),
-            
-            CBTotVol      = sum(Volume*(Community %in% cb_cso_towns),
-                                na.rm = TRUE),
+  summarize(CBTotVol      = sum(Volume, na.rm = TRUE),
             CBVolMG    = CBTotVol / (10^6),
-            CBTotEvents   = sum(Events*(Community %in% cb_cso_towns),
-                                na.rm = TRUE),
-            CBTotOutfalls = sum(Outfalls*(Community %in% cb_cso_towns),
-                                na.rm = TRUE),
-            
-            CBPctVol       = round(CBTotVol / TotVol, 4) * 100,
-            CBPctEvents    = round(CBTotEvents / TotEvents, 4) * 100,
-            CBPctOutfalls  = round(CBTotOutfalls / TotOutfalls, 4) * 100,
+            CBTotEvents   = sum(Events, na.rm = TRUE),
+            CBTotOutfalls = sum(Outfalls, na.rm = TRUE),
             .groups = 'drop') %>%
   filter(Year > 1996)
 ```
@@ -167,7 +137,6 @@ annual_data_all <- rain_data %>%
 rm(annual_data, cb_towns_data_wide, rain_data, the_data)
 ```
 
-
 ```{r correlation_figure}
 cors <- cor(annual_data_all, use = 'pairwise')
 corrplot(cors, method="circle", type = 'upper', tl.cex = .5)
@@ -175,16 +144,16 @@ rm(cors)
 ```
 What jumps out is:
 
-1. Year is negatively correlated with volume and events
-2. Year is positively (though not strongly) correlated with precipitation. 
+1. Year is negatively correlated with volume and events.  
+2. Year is positively (though not strongly) correlated with precipitation.   
 3. Total CSO VOlumes and Events statewide are dropping even faster than in
-   our region, so the percentage of the states CSOs from her is climbing.
+   our region, so the percentage of the states CSOs from her is climbing.  
 4. Volume and number of CSO events are correlated across the region. Bad
-   years in one jurisdiction are bad for many.
+   years in one jurisdiction are bad for many.  
 5. Portland's CSOs are a big enough part of regional and state-wide totals
-   so that they are always highly correlated with totals.
-The precipitation variables are not all that highly
-correlated with the other variables, but that 
+   so that they are always highly correlated with totals.  
+6.  The precipitation variables are not all that highly
+    correlated with the other variables
 
 # Generate Models and Extract Coefficients
 We want to extract slopes for the reduction in CSO volumes for each of our
@@ -324,7 +293,7 @@ par(oldpar)
 ```
 
 The residuals from the log-linear models are not bad.  There are a few outliers.  
-We have no outliers wit hhigh leverage.  These models are actually not bad.
+We have no outliers with high leverage.  These models are actually not bad.
  
 ## Log Median Based Models
 ```{r diagnotics_log_TS}
@@ -374,7 +343,7 @@ res %>%
          Ann_Pct_Chng_ts = tslogslope)
 ```
 These are statistically correct annual proportional reductions, but they
-do not capture change, as pointed out by one of out reviewers.
+do not capture change, as pointed out by one of our reviewers.
 
 ## Casco Bay - Wide Reductions over 23-Years
 We repeat the analysis, based on the sum of all discharges by town.
