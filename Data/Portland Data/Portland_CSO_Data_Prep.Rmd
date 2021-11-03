@@ -34,7 +34,7 @@ niece    <- file.path(sibling, niecenm)
 Notice that the DATES in these excel files are incorrect.  They are
 displayed in the spreadsheets as dates, showing only Month and Day, but the 
 underlying data is not necessarily from the year the data represents.  To
-correct for that, I assemble the date from day, month, and 
+correct for that, I assemble the date from day, month, and year.
 
 ## Find the Rain Files.
 ```{r}

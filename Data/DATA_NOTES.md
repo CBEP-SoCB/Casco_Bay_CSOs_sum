@@ -2,19 +2,20 @@
 <img src="https://www.cascobayestuary.org/wp-content/uploads/2014/04/logo_sm.jpg"
     style="position:absolute;top:10px;right:50px;" />
 
-# Preparation of Portland CSO Data
-We use an R Notebook to prepare the Portland data for  analysis, working with
+# Data Preparation Notes
+## Preparation of Portland CSO Data
+We used an R Notebook to prepare the Portland data for analysis, working with
 data from 2015 through 2019.
 
-## Reformatting 2015 Data
+### Reformatting 2015 Data
 The data from 2015 uses a slightly different  format from later years.  It is
 structured with a row for each DAY within events.  All other data sheets have
 a row for each EVENT, with a start date and an end date.
 
-We use R code to transform the data into the same format as presented from later
+We use R code to transform the 2015 data into the same format as used in later 
 years.
 
-## Unmeasured Discharges From 2015
+### Unmeasured Discharges From 2015
 In addition, missing data has different import in 2015.  In 2015, "--",
 which is interpreted as missing by our code, is flagged in the source file
 as meaning "metering data unavailable."  It is quite abundant at some CSO sites.  
@@ -67,21 +68,23 @@ We extracted data to Excel Files for further processing as follows:
    found.  Any town where CSOs were not reported for several years, like
    Rockland, will be misaligned. Any totals rows will be misaligned.
 6. The 2008 report does not provide data on the number of outfalls.  Neither do
-   the 2013 or 2014 reports we  also archived.  We can add three more years of
+   the 2013 or 2014 reports (also archived).  We can add three more years of
    record on the number of outfalls by extracting data from the 2016
-   report and adding it to the 2019 data.  The data from the 2016 report could
+   report and adding it to the 2019 data. The data from the 2016 report could
    not be copied successfully from the PDF, so data was copied by hand and typed
    manually into the spreadsheet.
 
+### Data From the 2008 Report
 We accessed data from the 2008 report, which CBEP has in our archives, to
 provide older data. Users should be cautious, as some of the older data (prior
-to about 1997) is estimated, and considered unreliable. Wedo not report on
-that older data in the 2020 Report because of uncertainty about its reliability.
+to about 1997) is estimated, and considered unreliable. We chose not to report
+on that older data in the 2020 Report because of uncertainty about its
+reliability.
 
-### Data From the 2008 Report
-Unfortunately, the older report was prepared slightly differently, and copying
-and pasting from the PDF is less successful, since the resulting data is not
-fully delimited.
+Unfortunately, the older report was prepared differently from the more recent
+Reports, so copying and pasting from the PDF was less successful.  The principle
+challenge was that  since the resulting data is not fully delimited.  We 
+processed the 2008 8 data as follows:
 
 1. Copy the entire table from the PDF, and paste it into Word.  It does not
    transfer to Word as a table, but as bare text.  
@@ -103,6 +106,7 @@ fully delimited.
 The original geospatial data was downloaded on September 12, 2019 by
 Curtis C. Bohlen, from:
 https://geolibrary-maine.opendata.arcgis.com/datasets/mainedep-cso.
+
 The equivalent data has since moved to:
 https://hub.arcgis.com/datasets/maine::mainedep-cso
 
@@ -118,12 +122,12 @@ The file includes both "Active" and "Inactive" CSOs.
 *  "OUTFALL_NA" in Portland does not always exactly match the names in the
    Portland data we received from PWD.  The CSO numbers are consistent.
 *  South Portland now only has four active CSO (per the 2019 CSO report), 
-   but this data still includes six nominally "Active" CSOs. We correct that 
-   in data preparation.
+   but the geospatial  data still includes six nominally "Active" CSOs. We 
+   corrected that in data preparation.
 
 ## Processing
-1.  We used ArcGIS to select CSO locations in the Casco Bay region, and saved them
-    in a shapefile "Regional_CSOs".   
+1.  We used ArcGIS to select CSO locations in the Casco Bay region, and saved
+    them in a shapefile "Regional_CSOs".  
 2,  To facilitate working with Portland's CSOs, for which we have detailed
     storm by storm discharge data, we exported a "Portland only" subset of the
     data as the "Portland_CSOs" shapefile.  
@@ -134,20 +138,22 @@ The file includes both "Active" and "Inactive" CSOs.
     renames towns in standard capitalization.  
 5.  We realized the on-line data is out of date, and includes two South Portland
     CSO locations that are no longer Active.  The Annual CSO reports from DEP
-    correctly states that South Portland now has only four CSOs.  That information 
-    simply is not represented in the on-line geospatial data.  We contacted South
-    Portland City staff, who confirmed that their CSO outfalls #4 and #19 are no
-    longer Active.  We removed them from the geospatial data by hand.
+    correctly states that South Portland now has only four CSOs.  That
+    information simply is not represented in the on-line geospatial data.  We
+    contacted South Portland City staff, who confirmed that their CSO outfalls
+    #4 and #19 are no longer Active.  We removed them from the geospatial data
+    by hand.
 
-For the "Portland_CSOs" shapefile, we took several additional steps:
-5.  We added a new (calculated) attribute with the form "CSO_###", which matches
+For the "Portland_CSOs" shapefile, we took several additional steps:  
+
+6.  We added a new (calculated) attribute with the form "CSO_###", which matches
     the nomenclature used in the Portland-specific CSO discharge data from 
     2015 through 2019.  
-6.  We imported the file "portland_cso_summary.csv", which was produced in R, to
-    ArcGIS, and "Joined" it to the "Portland_CSOs" layer.
-7.  We then created new attributes and transferred the data to the
+7.  We imported the file "portland_cso_summary.csv", which was produced in R, to
+    ArcGIS, and "Joined" it to the "Portland_CSOs" layer.  
+8.  We then created new attributes and transferred the data to the
     "Portland_CSOs" shapefile, thus adding data on CSO frequency and magnitude
     to the shapefile.  The presence of location names offers a chance to double
     check the text-based merge to make sure data was assigned to the correct
-    CSO location.
+    CSO location.  
 
