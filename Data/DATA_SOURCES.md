@@ -87,8 +87,9 @@ The equivalent data has since moved to:
 https://hub.arcgis.com/datasets/maine::mainedep-cso
 
 The source file contains a statewide CSO data layer (in shapefile format),
-derived from permit data. The source file includes both "Active" and "Inactive" CSOs.
-Our derived data and analyses focus on the "Active" CSOs only.
+derived from permit data. The source file includes both "Active" and "Inactive"
+CSOs Our derived data and analyses focus on the "Active" CSOs only, and 
+only CSOs located within the Casco Bay watershed.
 
 We received an e-mail from Fred Dillon of the City of South Portland, 
 identifying two CSO locations that are no longer Active, but that continue to be 
