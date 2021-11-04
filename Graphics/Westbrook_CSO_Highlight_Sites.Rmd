@@ -52,8 +52,6 @@ remediation_long <- remediation_data %>%
   pivot_longer(cols = c(2:3), names_to = 'CSO', values_to = 'Volume')
 ```
 
-
-
 ## Load Weather Data
 ### Access data
 We extract annual Precipitation Totals (in mm), and Annual Days with more than

@@ -449,8 +449,8 @@ least without adding graphics.
 
 # Calculate Annual Percent Changes
 
-The relationship between log-transformed variables and percent change is
-simply the following:
+The relationship between slope based on log-transformed variables and
+percent change is simply the following:
 
 $$\\frac{y(t+1)-y(t))}{y(t)}=e^m-1$$
 So, we can summarize the model results as follows:
@@ -472,7 +472,8 @@ res %>%
 ```
 
 These are statistically correct annual proportional reductions, but they
-do not capture change, as pointed out by one of our reviewers.
+do not capture overall change al that well, as pointed out by one of our
+reviewers.
 
 ## Casco Bay - Wide Reductions over 23-Years
 
@@ -519,8 +520,9 @@ cat('Related estimate of Annual Percent Change =',
 
 Because the models do not really meet our needs, We calculate three year
 mean and geometric mean discharges for the first three years and last
-three years of our record. That may better capture the type of long-term
-trend in a manner consistent with the request from our peer reviewers.
+three years of our record. Comparisons of those quanitites better
+capture the type of long-term trend in CSO discharges that our reviewers
+wanted highlighted.
 
 ``` r
 cb_totals <- cb_towns_data_long %>%
