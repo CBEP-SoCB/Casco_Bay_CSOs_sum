@@ -1,36 +1,55 @@
----
-title: "Casco Bay CSO Data Analysis, Portland CSO Graphics"
-author: Curtis C. Bohlen, Casco Bay Estuary Partnership
-output:
-  github_document:
-    toc: true
-    fig_width: 7
-    fig_height: 5
----
+Casco Bay CSO Data Analysis, Portland CSO Graphics
+================
+Curtis C. Bohlen, Casco Bay Estuary Partnership
+11/04/2021
+
+-   [Load Data](#load-data)
+    -   [Establish Folder References](#establish-folder-references)
+    -   [Load Data](#load-data-1)
+    -   [Load Weather Data](#load-weather-data)
+        -   [Access data](#access-data)
+    -   [Combine Data](#combine-data)
+    -   [Load Locations Lookup Table](#load-locations-lookup-table)
+-   [Graphics](#graphics)
+    -   [Combined Graphic, One Panel](#combined-graphic-one-panel)
+-   [Dunn Street Alone](#dunn-street-alone)
 
 <img
     src="https://www.cascobayestuary.org/wp-content/uploads/2014/04/logo_sm.jpg"
     style="position:absolute;top:10px;right:50px;" />
 
-```{r, echo = FALSE}
-  knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-```
+\#Load Libraries
 
-#Load Libraries
-```{r load_libraries}
+``` r
 library(tidyverse)
+#> Warning: package 'tidyverse' was built under R version 4.0.5
+#> -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+#> v ggplot2 3.3.5     v purrr   0.3.4
+#> v tibble  3.1.4     v dplyr   1.0.7
+#> v tidyr   1.1.3     v stringr 1.4.0
+#> v readr   2.0.1     v forcats 0.5.1
+#> Warning: package 'ggplot2' was built under R version 4.0.5
+#> Warning: package 'tibble' was built under R version 4.0.5
+#> Warning: package 'tidyr' was built under R version 4.0.5
+#> Warning: package 'readr' was built under R version 4.0.5
+#> Warning: package 'dplyr' was built under R version 4.0.5
+#> Warning: package 'forcats' was built under R version 4.0.5
+#> -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+#> x dplyr::filter() masks stats::filter()
+#> x dplyr::lag()    masks stats::lag()
 library(readxl)
 
 library(CBEPgraphics)
 load_cbep_fonts()
 theme_set(theme_cbep())
-
 ```
 
 # Load Data
+
 ## Establish Folder References
-```{r folder_references}
-sibfldnm   <- 'Original_Data'
+
+``` r
+sibfldnm   <- 'Data'
 niecefldnm <- 'PWD_Remediation'
 parent     <- dirname(getwd())
 sibling    <- file.path(parent,sibfldnm)
@@ -40,7 +59,8 @@ dir.create(file.path(getwd(), 'figures'), showWarnings = FALSE)
 ```
 
 ## Load Data
-```{r load_data}
+
+``` r
 fn <- "CSO-002_and_CSO-004_Annual_Overflow_Volumes.xlsx"
 fpath <- file.path(niece, fn)
 remediation_data <- read_excel(fpath, skip = 1,
@@ -52,11 +72,14 @@ remediation_long <- remediation_data %>%
 ```
 
 ## Load Weather Data
+
 ### Access data
-We extract annual Precipitation Totals (in mm), and Annual Days with more than
-one tenth of an inch (2.5mm), and one inch (25.4mm) of rain from the annual
-weather summaries from NOAA.
-```{r rain_data}
+
+We extract annual Precipitation Totals (in mm), and Annual Days with
+more than one tenth of an inch (2.5mm), and one inch (25.4mm) of rain
+from the annual weather summaries from NOAA.
+
+``` r
 fn <-'Annual_Weather_PWD.csv'
 fpath <- file.path(sibling, fn)
 rain_data <- read_csv(fpath, col_types =
@@ -75,14 +98,15 @@ rain_data <- read_csv(fpath, col_types =
 ```
 
 ## Combine Data
-```{r}
+
+``` r
 remediation_data <- remediation_data %>%
   left_join(rain_data, by = 'Year')
 ```
 
 ## Load Locations Lookup Table
-```{r load_locations}
 
+``` r
 locations_lookup <- tribble(
   ~CSO, ~Location,
 'CSO_002', 'Warren Ave.',
@@ -93,8 +117,10 @@ remediation_long <- remediation_long%>%
 ```
 
 # Graphics
+
 ## Combined Graphic, One Panel
-```{r revised_one_panel, fig.width = 4, fig.height = 3}
+
+``` r
 labs = locations_lookup$Location
 names(labs) = locations_lookup$CSO
 
@@ -125,7 +151,9 @@ plt <- ggplot(remediation_long) +
 plt
 ```
 
-```{r add_remediation_line, fig.width = 4, fig.height  = 3}
+<img src="Westbrook_CSO_Highlights_files/figure-gfm/revised_one_panel-1.png" style="display: block; margin: auto;" />
+
+``` r
 plt2 <- plt +
   geom_vline(xintercept = 2011, lty = 3) +
   geom_text(x = 2016.2, y = 4050,
@@ -139,7 +167,9 @@ plt2 <- plt +
 plt2
 ```
 
-```{r add_rainfall_extreme, fig.width = 4, fig.height = 3}
+<img src="Westbrook_CSO_Highlights_files/figure-gfm/add_remediation_line-1.png" style="display: block; margin: auto;" />
+
+``` r
 plt3 <- plt +
   geom_text(x = 2013.75,  y = 6550,
              label= '7.4 inches rain\nin 48 hours',
@@ -154,7 +184,10 @@ plt3 <- plt +
            size=1,arrow=arrow(length = unit(5, 'points')))
 plt3
 ```
-```{r add_both, fig.width = 4, fig.height  = 3}
+
+<img src="Westbrook_CSO_Highlights_files/figure-gfm/add_rainfall_extreme-1.png" style="display: block; margin: auto;" />
+
+``` r
 plt4 <- plt2 +
   geom_text(x = 2013.75,  y = 6550,
              label= '7.4 inches rain\nin 48 hours',
@@ -168,14 +201,18 @@ plt4 <- plt2 +
            color = cbep_colors()[4],
            size=1,arrow=arrow(length = unit(5, 'points')))
 plt4
+```
 
+<img src="Westbrook_CSO_Highlights_files/figure-gfm/add_both-1.png" style="display: block; margin: auto;" />
+
+``` r
 ggsave('figures/Westbrook_CSO_Highlight_Sites_one_panel.pdf',
         device = cairo_pdf, width = 4, height = 3)
 ```
 
 # Dunn Street Alone
-```{r dunn_street, fig.width = 2.5, fig.height = 3}
 
+``` r
 plt  <- remediation_long %>%
   filter(Location == 'Dunn Street') %>%
   
@@ -204,7 +241,11 @@ plt  <- remediation_long %>%
 
   theme(legend.position = 'bottom')
 plt
+```
+
+<img src="Westbrook_CSO_Highlights_files/figure-gfm/dunn_street-1.png" style="display: block; margin: auto;" />
+
+``` r
 ggsave('figures/Dunn_Street_Example.pdf',
         device = cairo_pdf, width = 4, height = 3)
 ```
-
