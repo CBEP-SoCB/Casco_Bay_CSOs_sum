@@ -216,8 +216,8 @@ What jumps out is:
 1.  Year is negatively correlated with volume and events.  
 2.  Year is positively (though not strongly) correlated with
     precipitation.  
-3.  Total CSO VOlumes and Events statewide are dropping even faster than
-    in our region, so the percentage of the states CSOs from her is
+3.  Total CSO Volumes and Events statewide are dropping even faster than
+    in our region, so the percentage of the state's CSOs from here is
     climbing.  
 4.  Volume and number of CSO events are correlated across the region.
     Bad years in one jurisdiction are bad for many.  
