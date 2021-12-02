@@ -88,7 +88,7 @@ processed the 2008 8 data as follows:
 
 1. Copy the entire table from the PDF, and paste it into Word.  It does not
    transfer to Word as a table, but as bare text.  
-2. Use global search and replace to replace all whitespace (designated by "^w"
+2. Use global search to replace all whitespace (designated by "^w"
    in the Find and Replace Dialog box) with tabs ("^t^").  This will *almost*
    work, but it will divide extra table boundaries for any table cell that
    contained a space.  
