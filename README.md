@@ -21,13 +21,9 @@ review, critique, learn from, and build upon CBEP science.
  "Graphics" folder.  The other two folders are only included if strictly
  necessary.
 
-- Original Data.  Original data, with one or more "DATA_SOURCES.md" files
-  that document how data was acquired.
-  **DATA IN THIS FOLDER IS AS ORIGINALLY PROVIDED OR ACCESSED** 
-
-- Derived Data.  Data derived from the original data.  Includes documentation of
-  data reorganization steps, either in the form of files (R notebooks, Excel
-  files, etc.) that embody data transformations, or via a DATA_NOTES.md file.
+- Data folder. Contains data in simplified or derived form as used in our data analysis. 
+  Associated metadata is contained in related Markdown documents, usually DATA_SOURCES.md 
+  and DATA_NOTES.md.
 
 - Analysis.  Contains one or more R Notebooks proceeding through the data
   analysis steps.  This folder is not always present, as formal statistical
